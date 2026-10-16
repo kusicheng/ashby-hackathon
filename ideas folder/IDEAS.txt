@@ -1,0 +1,102 @@
+
+Dr. Anil Parwani: 
+AI Summary:
+
+Dr. Parwani's view: the most useful applications of CONCH right now are context-based ones, where the model learns the language of pathology and acts as a guide: processing, classification, and helping pathologists think through cases. It is largely untested clinically and not ready for medical deployment. The barrier is not the model itself, which is scalable, but validation, safety, compliance, interpretability, and security. Getting from a research tool to a clinical application takes months of documented validation against external datasets and unknown variables. He stressed testing discipline: the right cases, the right controls, blind stress tests with unknown variables, consistency checks, and safety nets built into the program. For this hackathon he scoped what is feasible as safety and calibration of the model, plus external tools. He also pointed to education uses: guiding trainees like a hint system, since experienced pathologists need knowledge support rather than diagnostic help, and using foundation models to reduce subjectivity and variability in diagnosis.
+
+Example quotes (from call notes; confirm exact wording with Dr. Parwani before using on slides):
+- "The most useful applications would be context based, learning the language and understanding and helping almost as a guide, processing it and classification, largely untested clinically."
+- "CONCH is not entirely ready for medical deployment."
+- On what is feasible in this hackathon: "Safety and calibration of the model."
+
+Direct Notes from meeting:
+Improve the quality of feedback 
+Provide additional learning and
+Creating the roadmap
+
+Image: field with lots of trees, with the help of the model, to make some different colors, diagnosis
+Video game, -> stuck -> gives hint
+Safety mechanism
+Complement training -> years of training -> helping upcoming pathologists
+25+ years of experience (they don’t need the diagnostic help, need help for knowledge)
+
+Cancer -> some things are obsolete -> terminology might change
+Multiple applications
+Clinical contracts -> replacing textbook
+
+Comprehensive summary with static CONCH?
+Doable, can also provide with matching to other diseases, context-based image visualization
+Describing the tumor, describe things, upload the image and find search algorithm
+
+Acting like a worker assistant (a lot more app)
+
+CONCH
+Time series area -> one of the applications -> making sure the diagnostic process is correct
+How you are trained where you are trained
+Pathology can be very subjective (remove the subjectivity)
+Remove subjectivity
+Some variations in standard of care
+
+Foundational models can reduce variability, alternate ways to classify 
+Not just how the tumor looks, and how the tumor behaves
+Making sure that other things are not missing 
+A lot of cool things that could come out of
+
+Potential of CONCH is vastly unknown, many are not using digital images
+Could perhaps 
+The ability to make those comparisons
+
+CONCH not entirely ready for medical deployment 
+Is there a way to make a framework -> to make it ready
+See how expandable and generalizable it is
+Context to increasing the accuracy
+
+Pathology (may have multiple diseases) -> there is a limited number of categories,
+Different combinations
+Not just could be the prediction can be -> pixelonics 
+
+I think right now the most useful applications would be -> context based, learning the language and understanding and helping almost as a guide, processing it and classification, largely untested clinically
+The real test would be from a patient chart -> analytical at (real time?)
+
+Is there a specific reason why it hasn’t been deployed regularly to 
+Lots of hardware and interpretability, not clinical grade, compliance (issues), validation, safety, not easy to bring a model to clinical production 
+
+Most academic institutions need it to be validated
+Require more (profit?)
+Validate and document against external dataset, against unknown variables
+A lot of work to get from a research tool -> clinical application (takes several months for it to actual)
+
+Model itself is not hard to make it scalable, most clinical environments have the capacity or computing power to run this, must be on the cloud
+Security issue
+
+Whole process, a lot of things that need 
+
+Student right cases and right controls
+Stress test the system, put in the blind system and put in unknown variables, might need to test for consistency
+Remains a domain expertise, prostate cancer -> might have different variation, that students might not know
+
+Safety nets into the program
+
+
+In our hackathon
+Feasible:
+Safety and calibration of the model
+External tools
+
+
+
+Dr. Raj Dash:
+AI Summary:
+Dr. Dash (Duke, Vice Chair of Anatomic Pathology and Informatics) answered in writing instead of a call. His central point: trust is the wrong frame. What matters is transparency and verifiability, with a human in the loop who can evaluate what the AI produced, because a doctor should never blindly trust an AI. For retrieval, the most useful pattern is pulling prior pathology for the same patient, for example comparing a new lesion against that patient's earlier tumor when judging a possible metastasis. Similar-case retrieval also helps trainees. His 'holy grail' is an AI that pre-screens cases like a resident does for an attending pathologist: drafting a narrative diagnosis and CAP cancer protocol, and annotating slides with tumor dimensions, distance to margins, in situ versus invasive disease, lymphovascular invasion, and lymph node counts. He granted permission to quote him by name in our presentation.
+
+Example quotes (verbatim from his email, permission granted):
+"Transparency therefore is more important as you really don't want your doc blindly trusting an AI, do you?"
+- "This is an AI essentially screening cases like a resident (trainee) does for an attending pathologist."
+- "Usually the need is to pull prior pathology for the specific patient we are currently caring for."
+
+
+Summary so far (Oct 16, 2026):
+Two senior pathologists have weighed in so far, and they converge on the same gap: the models are not the bottleneck. The missing layer is validation, calibration, safety, and verifiability with a human in the loop. Dr. Parwani, a CONCH co-author, scoped what is buildable this weekend: safety and calibration of the model, plus external tools, tested with the right cases, the right controls, and blind stress tests with unknown variables. Dr. Dash added that AI output must be transparent and easy to verify, and that the most valuable retrieval is a patient's own prior pathology. 
+The direction this points to: a second-look safety layer around CONCH rather than another diagnostic demo. Still to add: Dr. Feldman and Dr. Cornish (notes being extracted from recordings).
+
+

@@ -1,0 +1,134 @@
+KUSIC IDEATION PROTOTYPES
+Author: Kevin-C
+Date: 2026-10-16
+Version: 1 (ideas recorded before implementation)
+
+SOURCE AND SCOPE
+The existing "ideas folder/IDEAS.txt" contains user-provided pathology interview
+notes. Preserve that file. This portfolio interprets those notes as a request for
+CONCH-adjacent research prototypes. Notes and attributed quotations are not
+independently verified. No quotation will be republished by these prototypes.
+All initial experiments use invented cases, scores, labels, and identifiers.
+No patient data, competition data, model weights, or credentials are required.
+Research demonstrations only; no clinical effectiveness claim.
+
+COMPARABLE EVALUATION PLAN (fixed before implementation)
+All four ideas receive the same report schema: idea_id, author, status, four
+integer scores (1-10), score rationale, named functional checks, effectiveness
+measurements, limitations, evidence path, and recommendation.
+Complexity: 1=simple rule; 3=small standalone workflow; 5=multiple validated
+components; 7=model/institution integration; 10=clinical production system.
+User-friendliness: 1=expert-only opaque output; 3=manual interpretation;
+5=structured output; 7=clear reason/action; 10=independently validated usability.
+Legal issues: 1=local synthetic-only utility; 3=licensed educational content;
+5=sensitive record handling; 7=patient-specific decision support;
+10=autonomous diagnosis/high unresolved deployment exposure.
+Creativity: 1=standard baseline; 3=familiar isolated feature;
+5=useful recombination; 7=distinct workflow; 10=validated novel approach.
+Scores assess intended deployment burden and current prototype design, not a
+legal opinion, clinical performance estimate, or measured user satisfaction.
+Effectiveness is measured separately with deterministic functional scenarios,
+baseline comparisons where meaningful, edge/adversarial cases, and runtimes.
+Do not compare accuracy numbers across different tasks as if interchangeable.
+Priority index = ((11-Complexity)+User-friendliness+(11-Legal issues)+Creativity)/4.
+Equal weights are a transparent screening heuristic, not a scientific ranking.
+
+IDEA K01: Calibrated second-look safety gate
+Status: PLANNED
+*brief description*
+Fit score calibration on one split and a selective abstention policy on another,
+then expose confidence, reasons to defer, and a human-review action.
+*functionality 1*
+Temperature calibration for supplied classification logits; no diagnostic model.
+*functionality 2*
+Separate threshold selection and held-out evaluation; refuse malformed scores,
+unsupported scope, or incomplete provenance; never claim an output is safe.
+*functionality 3*
+Compare raw and calibrated probability error plus accepted error and coverage.
+*Concerns regarding legal deployment and use*
+Patient-specific decisions could require medical-device analysis, institution
+approval, privacy controls, and external validation. Research code is insufficient.
+*Concerns on complexity/user friendliness*
+Confidence is not correctness. Calibration and rejection thresholds can drift;
+show rejected cases and explicit reasons instead of a reassuring approval badge.
+*Concerns on Ethics and Creative rights*
+Audit subgroup exclusions and model/data licenses. Do not reuse slide imagery,
+interview quotations, or model outputs without relevant permissions.
+*summary and conclusion of where the current progress of idea is*
+Recorded before building. Main scripts: kusic-ideation-prototypes/kusic/safety.py.
+Evidence and scores: pending controlled experiments.
+
+IDEA K02: Provenance-locked patient-prior retrieval
+Status: PLANNED
+*brief description*
+Retrieve authorized earlier records for the same synthetic patient before
+considering image similarity, with explicit identity and chronology checks.
+*functionality 1*
+Filter by authorized patient, date, institution, and permitted record use.
+*functionality 2*
+Rank eligible embedding matches with similarity and traceable source IDs.
+*functionality 3*
+Compare with unrestricted nearest-neighbor retrieval and test wrong-patient,
+future-record, duplicate-record, missing-source, and empty-result cases.
+*Concerns regarding legal deployment and use*
+Real retrieval needs lawful access, data-use agreements, authentication, retention
+rules, and access auditing. Patient identity matching must be validated locally.
+*Concerns on complexity/user friendliness*
+Identifiers can collide across institutions. Clear empty states and reasons are
+needed. Small exact search will not establish whole-hospital scaling.
+*Concerns on Ethics and Creative rights*
+Respect patient privacy, slide ownership, embedding licenses, and access revocation.
+Never imply that similarity proves metastasis or a diagnosis.
+*summary and conclusion of where the current progress of idea is*
+Recorded before building. Main scripts: kusic-ideation-prototypes/kusic/retrieval.py.
+Evidence and scores: pending controlled experiments.
+
+IDEA K03: Evidence-linked trainee hint ladder
+Status: PLANNED
+*brief description*
+An offline educational hint workflow that reveals observations progressively and
+links each hint to a reviewed, licensed teaching source instead of inventing text.
+*functionality 1*
+Progress from observation prompts to comparison prompts to a teaching explanation.
+*functionality 2*
+Require source, content permission, review date, and educational-use status.
+*functionality 3*
+Block patient-specific diagnosis requests and stale/unreviewed teaching content;
+compare with a permissive keyword-style content baseline.
+*Concerns regarding legal deployment and use*
+Education intent does not itself settle device status. Real content needs licenses,
+editorial review, privacy controls, and separation from patient-care decisions.
+*Concerns on complexity/user friendliness*
+Deterministic hints avoid unsupported generation but depend on authored coverage.
+Do not confuse a completed lesson with competence or diagnostic accuracy.
+*Concerns on Ethics and Creative rights*
+Use original fictional teaching text; preserve attribution and permissions for
+future real educational material; avoid copying proprietary reporting protocols.
+*summary and conclusion of where the current progress of idea is*
+Recorded before building. Main scripts: kusic-ideation-prototypes/kusic/hints.py.
+Evidence and scores: pending controlled experiments.
+
+IDEA K04: Blind robustness and consistency audit
+Status: PLANNED
+*brief description*
+Audit matched clean/perturbed prediction pairs for calibration degradation,
+prediction instability, and subgroup differences using blinded evaluation IDs.
+*functionality 1*
+Validate clean/perturbed pairing and prevent incomplete or duplicate case pairing.
+*functionality 2*
+Measure accuracy, probability error, prediction flips, and subgroup support.
+*functionality 3*
+Compare known stable and deliberately unstable synthetic predictors and clearly
+mark small groups as insufficient evidence.
+*Concerns regarding legal deployment and use*
+Audit results cannot certify clinical readiness. Real data require appropriate
+access and model licenses; external validation and qualified review remain needed.
+*Concerns on complexity/user friendliness*
+Metrics need interpretation and realistic perturbations. A report with reasons
+is useful, but does not replace independent controls or a representative cohort.
+*Concerns on Ethics and Creative rights*
+Avoid hiding small or poorly performing groups; record dataset/model provenance;
+do not expose patient identifiers in exported reports.
+*summary and conclusion of where the current progress of idea is*
+Recorded before building. Main scripts: kusic-ideation-prototypes/kusic/robustness.py.
+Evidence and scores: pending controlled experiments.
