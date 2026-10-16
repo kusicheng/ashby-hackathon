@@ -4,6 +4,7 @@ import json
 import queue
 import threading
 import tkinter as tk
+from pathlib import Path
 from tkinter import filedialog, messagebox, ttk
 from tkinter.scrolledtext import ScrolledText
 
@@ -15,6 +16,7 @@ class Workbench:
         self.root = root
         self.report = None
         self.evaluated_payload = None
+        self.protected_paths = []
         self.busy = False
         self.completed = queue.Queue()
         root.title("Kevin-C | Pathology Research Workbench")
@@ -79,6 +81,11 @@ class Workbench:
             actions, text="Inspect prior source", command=self.inspect_source
         )
         self.source_button.pack(side="left", padx=5)
+        self.embed_button = ttk.Button(
+            actions, text="Embed local images", command=self.embed_images
+        )
+        self.embed_button.pack(side="left", padx=5)
+        self.buttons.append(self.embed_button)
         self.status = tk.StringVar(value="Ready")
         ttk.Label(outer, textvariable=self.status, wraplength=1090).pack(anchor="w", pady=(10, 0))
         self.load_sample()
@@ -131,6 +138,7 @@ class Workbench:
         self.load_sample()
 
     def load_sample(self):
+        self.protected_paths = []
         payload = workbench.module_for(self.idea.get()).demo_payload()
         self._set_text(self.input, json.dumps(payload, indent=2), editable=True)
         self.guidance.configure(text=presentation.GUIDANCE[self.idea.get()])
@@ -148,6 +156,7 @@ class Workbench:
             return
         try:
             payload = workbench.read_request(path)
+            self.protected_paths = [path]
             self._set_text(self.input, json.dumps(payload, indent=2), editable=True)
             self._invalidate()
             self.status.set("Local input loaded. Check the selected workflow, then Run input.")
@@ -191,6 +200,10 @@ class Workbench:
             self._actions()
             self.tabs.select(0)
             return
+        prepared_input = report.pop("_prepared_input", None)
+        if prepared_input is not None:
+            self.evaluated_payload = prepared_input
+            self._set_text(self.input, json.dumps(prepared_input, indent=2), editable=True)
         self.report = report
         self._set_text(self.summary, presentation.summary(report))
         self._set_text(self.evidence, json.dumps(report, indent=2, allow_nan=False))
@@ -212,6 +225,47 @@ class Workbench:
 
     def compare(self):
         self._start(workbench.portfolio)
+
+    def embed_images(self):
+        manifest_path = filedialog.askopenfilename(
+            title="Open a K02 image manifest (image_path replaces embedding)",
+            filetypes=[("JSON", "*.json")],
+        )
+        if not manifest_path:
+            return
+        weights_path = filedialog.askopenfilename(
+            title="Select your local CONCH weight file",
+            filetypes=[("CONCH weights", "*.bin")],
+            initialdir=str(Path(__file__).resolve().parents[2] / "models"),
+        )
+        if not weights_path:
+            return
+        try:
+            payload = workbench.read_request(manifest_path)
+        except (ValueError, OSError) as error:
+            messagebox.showerror("Could not open image manifest", str(error))
+            return
+        self.protected_paths = [
+            manifest_path,
+            weights_path,
+            *workbench.image_manifest_sources(payload, Path(manifest_path).resolve().parent),
+        ]
+        self.selector.current(1)
+        self.idea.set("K02")
+        self.guidance.configure(text=presentation.GUIDANCE["K02"])
+
+        def operation():
+            from kusic.conch_adapter import embed_priors
+
+            prepared = embed_priors(
+                payload, weights_path, base_dir=Path(manifest_path).resolve().parent
+            )
+            report = workbench.run_request("K02", prepared["request"])
+            report["embedding_provenance"] = prepared["provenance"]
+            report["_prepared_input"] = prepared["request"]
+            return report
+
+        self._start(operation)
 
     def next_hint(self):
         payload = dict(self.evaluated_payload)
@@ -247,9 +301,10 @@ class Workbench:
         )
         if path:
             try:
+                workbench.protect_outputs([path], self.protected_paths)
                 workbench.write_json(path, self.report)
                 self.status.set("Completed result exported. Input edits require a new run.")
-            except OSError as error:
+            except (ValueError, OSError) as error:
                 messagebox.showerror("Export failed", str(error))
 
     def export_csv(self):
@@ -258,13 +313,20 @@ class Workbench:
         )
         if path:
             try:
+                workbench.protect_outputs([path], self.protected_paths)
                 workbench.write_comparison_csv(path, self.report)
                 self.status.set("Comparable scores exported to CSV.")
-            except OSError as error:
+            except (ValueError, OSError) as error:
                 messagebox.showerror("Export failed", str(error))
 
 
 def launch():
-    root = tk.Tk()
+    try:
+        root = tk.Tk()
+    except tk.TclError as error:
+        raise ValueError(
+            "The desktop could not initialize Tcl/Tk. Try a normal terminal with "
+            "Python's Tcl/Tk installed, or use the run/demo command interface."
+        ) from error
     Workbench(root)
     root.mainloop()

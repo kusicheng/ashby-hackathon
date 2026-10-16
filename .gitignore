@@ -1,6 +1,7 @@
 # Local datasets, model artifacts, and Rex continuity
 /data/
 /outputs/
+/models/
 /cc_mnt/
 /ARCHIVE/
 /tests/

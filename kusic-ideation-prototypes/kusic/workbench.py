@@ -31,12 +31,12 @@ SCORES = {
         "recommendation": "Continue as a research gate; externally validate before patient use.",
     },
     "K02": {
-        "complexity": 5,
+        "complexity": 6,
         "user_friendliness": 7,
         "legal_issues": 6,
         "creativity": 5,
         "rationale": {
-            "complexity": "Identity, chronology, authorization and vector ranking must agree.",
+            "complexity": "Identity/time/access checks plus optional CONCH runtime, safe weights and image preprocessing.",
             "user_friendliness": "Ranked evidence references and exclusion reasons are actionable.",
             "legal_issues": "Intended real-record retrieval handles sensitive longitudinal records.",
             "creativity": "Familiar retrieval anchored to the patient's own prior records.",
@@ -109,6 +109,34 @@ def read_request(path):
     if path.stat().st_size > 2_000_000:
         raise ValueError("Input exceeds the 2 MB prototype limit")
     return parse_request(path.read_text(encoding="utf-8-sig"))
+
+
+def image_manifest_sources(payload, base_dir):
+    """Collect declared image assets without loading optional model packages."""
+    items = [payload.get("query")]
+    if isinstance(payload.get("records"), list):
+        items.extend(payload["records"])
+    paths = []
+    for item in items:
+        if isinstance(item, dict) and isinstance(item.get("image_path"), str):
+            path = Path(item["image_path"])
+            paths.append(path if path.is_absolute() else Path(base_dir) / path)
+    return paths
+
+
+def protect_outputs(outputs, inputs):
+    """Refuse output aliases to declared inputs, including existing hard links."""
+    resolved_inputs = [Path(path).resolve() for path in inputs]
+    resolved_outputs = []
+    for output in outputs:
+        target = Path(output).resolve()
+        for other in resolved_inputs + resolved_outputs:
+            same = target == other
+            if not same and target.exists() and other.exists():
+                same = target.samefile(other)
+            if same:
+                raise ValueError("Output would overwrite a declared input asset or another output")
+        resolved_outputs.append(target)
 
 
 def run_request(idea_id, payload):

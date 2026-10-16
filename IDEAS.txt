@@ -1,12 +1,12 @@
 KUSIC IDEATION PROTOTYPES
 Author: Kevin-C
 Date: 2026-10-16
-Version: 1 (ideas recorded before implementation)
+Version: 2 (ideas recorded before implementation, then updated with test evidence)
 
 SOURCE AND SCOPE
 The existing "ideas folder/IDEAS.txt" contains user-provided pathology interview
-notes. Preserve that file. This portfolio interprets those notes as a request for
-CONCH-adjacent research prototypes. Notes and attributed quotations are not
+notes. Preserve that file. The user confirmed the UIUC Ashby Prize product/tool
+scope. This portfolio builds CONCH-adjacent research prototypes. Notes and quotations are not
 independently verified. No quotation will be republished by these prototypes.
 All initial experiments use invented cases, scores, labels, and identifiers.
 No patient data, competition data, model weights, or credentials are required.
@@ -25,8 +25,12 @@ Legal issues: 1=local synthetic-only utility; 3=licensed educational content;
 10=autonomous diagnosis/high unresolved deployment exposure.
 Creativity: 1=standard baseline; 3=familiar isolated feature;
 5=useful recombination; 7=distinct workflow; 10=validated novel approach.
-Scores assess intended deployment burden and current prototype design, not a
-legal opinion, clinical performance estimate, or measured user satisfaction.
+Score scope: Complexity, User-friendliness, and Creativity assess the scoped
+prototype product design, including its desktop/JSON workflow. Legal issues
+assesses anticipated real deployment of each intended workflow. The present
+invented-data-only implementation has a separate Legal issues score of 1 for all
+four ideas. Scores are design judgments, not a legal opinion, clinical performance
+estimate, novelty/patentability finding, or measured user satisfaction.
 Effectiveness is measured separately with deterministic functional scenarios,
 baseline comparisons where meaningful, edge/adversarial cases, and runtimes.
 Do not compare accuracy numbers across different tasks as if interchangeable.
@@ -34,7 +38,7 @@ Priority index = ((11-Complexity)+User-friendliness+(11-Legal issues)+Creativity
 Equal weights are a transparent screening heuristic, not a scientific ranking.
 
 IDEA K01: Calibrated second-look safety gate
-Status: PLANNED
+Status: PROTOTYPED - CONTINUE AS RESEARCH COMPONENT
 *brief description*
 Fit score calibration on one split and a selective abstention policy on another,
 then expose confidence, reasons to defer, and a human-review action.
@@ -55,11 +59,28 @@ show rejected cases and explicit reasons instead of a reassuring approval badge.
 Audit subgroup exclusions and model/data licenses. Do not reuse slide imagery,
 interview quotations, or model outputs without relevant permissions.
 *summary and conclusion of where the current progress of idea is*
-Recorded before building. Main scripts: kusic-ideation-prototypes/kusic/safety.py.
-Evidence and scores: pending controlled experiments.
+Recorded before building. Main: kusic-ideation-prototypes/kusic/safety.py.
+Working desktop and CLI support supplied logits and original synthetic templates.
+Calibration/selection/evaluation contain 40/16/16 separate case IDs. Calibrated
+held-out NLL improves 1.056520 -> 0.599077; Brier 0.476312 -> 0.402896;
+10-bin ECE 0.210102 -> 0.087725. Accuracy remains 68.75%. Temperature is 2.88539.
+Both raw and calibrated selective policies retain 62.5% of held-out cases with
+20% retained error, exceeding the 10% selection target. Calibration did NOT
+establish safer decisions. This visible failure is useful for the research tool.
+High-logit analytical regression caught and fixed a clipped-loss fitting bug.
+Checks cover split contamination, tied thresholds, no-retention behavior,
+provenance, numeric extremes, and untouched policy when evaluation labels change.
+Scores (1-10): Complexity=5; User-friendliness=6; Legal issues=7; Creativity=5.
+Current synthetic-only Legal issues=1. Equal-weight priority index=5.25/10.
+Rationale: three cohorts and policy fitting increase complexity; explicit reasons
+help researchers but risk/coverage interpretation requires expertise; patient-care
+use raises deployment questions; methods are a useful known-method combination.
+Evidence: tests/results/evaluation.json (K01), tests/test_kevin_safety_audit.py.
+Conclusion: continue alongside K04; no CONCH/image inference or external cohort
+validation is implemented. Disjoint case IDs do not prove patient independence.
 
 IDEA K02: Provenance-locked patient-prior retrieval
-Status: PLANNED
+Status: PROTOTYPED - CONTINUE AFTER ACCESS/IDENTITY INTEGRATION
 *brief description*
 Retrieve authorized earlier records for the same synthetic patient before
 considering image similarity, with explicit identity and chronology checks.
@@ -70,6 +91,13 @@ Rank eligible embedding matches with similarity and traceable source IDs.
 *functionality 3*
 Compare with unrestricted nearest-neighbor retrieval and test wrong-patient,
 future-record, duplicate-record, missing-source, and empty-result cases.
+*functionality 4 (extension recorded before building)*
+2026-10-16: A user-provided models/conch.bin appeared during implementation.
+Test an optional, explicitly invoked CPU-only local-image embedding adapter for
+K02, using the publisher CONCH implementation and bounded batches/threads. The
+desktop/JSON prototype must continue working without that optional dependency.
+Use generated shape fixtures to test integration; no pathology accuracy claim.
+Do not download weights, redistribute assets, or use unsafe pickle loading.
 *Concerns regarding legal deployment and use*
 Real retrieval needs lawful access, data-use agreements, authentication, retention
 rules, and access auditing. Patient identity matching must be validated locally.
@@ -80,11 +108,42 @@ needed. Small exact search will not establish whole-hospital scaling.
 Respect patient privacy, slide ownership, embedding licenses, and access revocation.
 Never imply that similarity proves metastasis or a diagnosis.
 *summary and conclusion of where the current progress of idea is*
-Recorded before building. Main scripts: kusic-ideation-prototypes/kusic/retrieval.py.
-Evidence and scores: pending controlled experiments.
+Recorded before building. Main: kusic-ideation-prototypes/kusic/retrieval.py.
+Eight invented records contain two eligible priors. Unrestricted top-three
+similarity retrieves three ineligible records (eligibility precision 0%); guarded
+retrieval returns both eligible priors (eligibility precision 100%, recall 100%).
+These are metadata-rule metrics, not clinical relevance or diagnostic accuracy.
+Controls cover wrong patient/institution, future timestamps, consent, source,
+permitted use, ties, duplicate/ambiguous IDs, and stable vector normalization.
+Default export uses opaque references. Opt-in local source inspection rechecks
+current eligibility and returns the original source and one-based input row.
+Scores (1-10): Complexity=6; User-friendliness=7; Legal issues=6; Creativity=5.
+Current synthetic-only Legal issues=1. Equal-weight priority index=5.50/10.
+Rationale: identity/time/access checks plus ranking require care; source inspection
+and clear exclusions support verification; real longitudinal records raise privacy
+and access burdens; same-patient prioritization is a practical familiar pattern.
+Evidence: tests/results/evaluation.json (K02), tests/test_kevin_retrieval.py.
+Complexity rose from 5 to 6 after recording and building the optional image/model
+adapter. The user-supplied CONCH visual weights load with strict tensor checks.
+Five real integration controls pass on four generated image inputs: finite
+512-value unit embeddings, identical-image agreement, visible unrestricted
+identity failure, and a resolvable eligible source. Final run: 29.446 seconds,
+1320.8 MiB peak working set (initial cold run: 43.38 seconds, 1319.9 MiB).
+These are engineering timings, not a controlled performance benchmark.
+CLI embed-priors and desktop Embed local images prepare K02 requests using
+batch size 1/two CPU threads/at most 16 images; no GPU, downloads or training.
+Provenance records weight/image/source/runtime hashes and versions. Forty-three
+mocked adapter checks cover file/schema limits, safe checkpoint loading, strict
+state matching, publisher preprocessing order, local paths and thread recovery.
+Evidence for the real-weight run: tests/results/conch_smoke.json.
+Conclusion: functioning offline image/model integration; real authentication, access audit,
+record linkage and external retrieval relevance validation remain unimplemented.
+Authorization and consent are caller-supplied claims. All supplied records,
+including the baseline comparison cohort, must already be lawfully accessible.
+Opaque references are pseudonyms and do not establish de-identification.
 
 IDEA K03: Evidence-linked trainee hint ladder
-Status: PLANNED
+Status: PROTOTYPED - RETAIN AS EDUCATION MODULE
 *brief description*
 An offline educational hint workflow that reveals observations progressively and
 links each hint to a reviewed, licensed teaching source instead of inventing text.
@@ -93,7 +152,7 @@ Progress from observation prompts to comparison prompts to a teaching explanatio
 *functionality 2*
 Require source, content permission, review date, and educational-use status.
 *functionality 3*
-Block patient-specific diagnosis requests and stale/unreviewed teaching content;
+Block requests explicitly tagged patient_diagnosis and stale/unreviewed teaching content;
 compare with a permissive keyword-style content baseline.
 *Concerns regarding legal deployment and use*
 Education intent does not itself settle device status. Real content needs licenses,
@@ -105,14 +164,31 @@ Do not confuse a completed lesson with competence or diagnostic accuracy.
 Use original fictional teaching text; preserve attribution and permissions for
 future real educational material; avoid copying proprietary reporting protocols.
 *summary and conclusion of where the current progress of idea is*
-Recorded before building. Main scripts: kusic-ideation-prototypes/kusic/hints.py.
-Evidence and scores: pending controlled experiments.
+Recorded before building. Main: kusic-ideation-prototypes/kusic/hints.py.
+Desktop Next hint progresses through three original, fictional shape prompts.
+One reviewed fixture and five deliberately invalid scenarios are evaluated.
+An executed permissive lookup exposes content in all five invalid scenarios;
+the guarded workflow exposes none and still serves the valid fixture (6/6
+expected decisions). There is no measured learning gain or curriculum coverage.
+Checks cover source/permission/reviewer, old/future review dates, incomplete
+hints, duplicate lesson IDs, invalid steps, and malformed metadata types.
+Scores (1-10): Complexity=3; User-friendliness=7; Legal issues=3; Creativity=5.
+Current synthetic-only Legal issues=1. Equal-weight priority index=7.00/10.
+Rationale: authored content and a small workflow are simple; progressive prompts
+are clear; licensed educational deployment still needs content/intent review;
+hint progression and provenance are familiar features usefully combined.
+Evidence: tests/results/evaluation.json (K03), tests/test_kevin_hints.py.
+Conclusion: useful product interaction, but no pathology curriculum or clinical
+review is claimed. Caller intent is a tag, not a detector of diagnosis requests.
+Metadata cannot independently prove permission or expert review. Keep as a
+module; do not choose it as the main Ashby submission just from its high index.
 
-IDEA K04: Blind robustness and consistency audit
-Status: PLANNED
+IDEA K04: Paired robustness and consistency audit
+Status: PROTOTYPED - LEAD HACKATHON DEMONSTRATION
 *brief description*
 Audit matched clean/perturbed prediction pairs for calibration degradation,
-prediction instability, and subgroup differences using blinded evaluation IDs.
+prediction instability, and subgroup differences using opaque evaluation IDs.
+Synthetic IDs do not establish experimental blinding or an independent study.
 *functionality 1*
 Validate clean/perturbed pairing and prevent incomplete or duplicate case pairing.
 *functionality 2*
@@ -130,5 +206,67 @@ is useful, but does not replace independent controls or a representative cohort.
 Avoid hiding small or poorly performing groups; record dataset/model provenance;
 do not expose patient identifiers in exported reports.
 *summary and conclusion of where the current progress of idea is*
-Recorded before building. Main scripts: kusic-ideation-prototypes/kusic/robustness.py.
-Evidence and scores: pending controlled experiments.
+Recorded before building as a blind-audit concept. Review narrowed the name to
+paired audit because no independent experimental blinding has been established.
+Main: kusic-ideation-prototypes/kusic/robustness.py. Fifteen clean/perturbed pairs:
+stable control has 0% flips and 100% accuracy after perturbation; deliberately
+unstable control has 66.67% flips and 33.33% accuracy after perturbation.
+Mean total variation is 0.0200 stable versus 0.4733 unstable. Small group n=2 is
+retained in the report with insufficient support and no performance metrics.
+Checks cover complete ID pairing, changed labels/groups, duplicate IDs,
+probability sums/dimensions, nonfinite values, exact hand-calculated metrics,
+order invariance, and subgroup minimum boundaries.
+Scores (1-10): Complexity=4; User-friendliness=6; Legal issues=3; Creativity=5.
+Current synthetic-only Legal issues=1. Equal-weight priority index=6.50/10.
+Rationale: paired data plus subgroup metrics are manageable; interpretation needs
+research expertise; offline audit has less direct care intent than K01/K02;
+the combination improves workflow without a claim that the methods are novel.
+Evidence: tests/results/evaluation.json (K04), tests/test_kevin_safety_audit.py.
+Conclusion: lead product demonstration with K01 as supporting analysis. Current
+perturbations change supplied score vectors, not real pathology images. Real
+licensed model exports, realistic image perturbations, and external validation
+are needed to establish scientific or clinical effectiveness.
+
+SHARED PRODUCT, TESTING AND DECISION RECORD
+Main entry: kusic-ideation-prototypes/run.py (default desktop; CLI also available).
+Four workflows share editable templates, local JSON loading, result explanations,
+evidence JSON, optional source inspection, and report export. No service/account
+is needed. All test scripts, the evaluation harness, Ruff tooling and generated
+JSON/CSV evidence are saved under the gitignored tests/ directory.
+Raw data, credentials, interview notes and historical missing files are untouched.
+No idea is dropped: each has a working scoped prototype and a distinct use.
+K04 leads on the interview/competition fit; K03's higher equal-weight index is an
+ease-of-building result, not proof of greater medical value. No new fifth idea
+was introduced during implementation. K02's optional local-image adapter was
+recorded above before implementation after a local weight file appeared.
+No model weights or datasets were fetched.
+The original ultrasound training work remains paused and separate from this goal.
+Final validation: 212 pytest cases pass, including 13 hidden desktop scenarios;
+Ruff lint and formatting pass for source and explicitly named ignored tests;
+the comparable evaluation harness passes 9/9 controls; the real-weight image
+integration harness passes 5/5 controls. Test logs and JUnit XML are saved in
+tests/results/. The absent historical train.py cannot run its old smoke command.
+Launch/use instructions are in kusic-ideation-prototypes/README.md.
+
+PRIMARY SOURCES REVIEWED 2026-10-16 (context, not legal clearance)
+UIUC/NCSA challenge and judging criteria:
+https://ai.ncsa.illinois.edu/education/2026-ashby-prize-in-computational-science-hackathon/
+The challenge concerns pathology workflows and augmentation of foundation models.
+Synthetic score controls and an actual CONCH integration test do not establish
+pathology performance. The user will locate the provided pathology data later.
+CONCH publisher repository/license and access terms:
+https://github.com/mahmoodlab/CONCH#license-and-terms-of-use
+Review the exact chosen model/version terms before integration, derivative use,
+redistribution, or commercial use. The optional adapter reads the user's local
+weights for research; it does not distribute weights or auto-download assets.
+FDA Clinical Decision Support Software guidance:
+https://www.fda.gov/regulatory-information/search-fda-guidance-documents/clinical-decision-support-software
+Intended use and functionality matter. Human review or an educational label alone
+does not establish regulatory exclusion, especially for image-based tools.
+HHS HIPAA and research:
+https://www.hhs.gov/hipaa/for-professionals/special-topics/research/index.html
+Identifiable health-record research needs an appropriate lawful route. Invented
+data avoid that current exposure; pseudonyms alone are not de-identification.
+HHS privacy standards and training context:
+https://www.hhs.gov/hipaa/for-professionals/privacy/guidance/standards-privacy-individually-identifiable-health-information/index.html
+Institution-supervised training does not give a hackathon app blanket data access.
